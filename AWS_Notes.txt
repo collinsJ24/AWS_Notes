@@ -1454,6 +1454,7 @@ Query then executed by thousands of Redshift spectrum nodes
 OpenSearch
 
 Successor to ElasticSearch
+Search and analytic suite use for real-time app monitoring, log analytics and website search
 You can search any fields in a database
 Does not support SQL
 Is not serverless
@@ -1644,6 +1645,961 @@ SageMaker - ML for devs and data scientists
 Forecast - build highly accurate forecasts
 Kendra - ML- powered search engine - document search
 Personalize - real-time personalized recommendations
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+CloudWatch Metrics
+
+Provided metrics for every service in AWS
+mETRICS BELONG TO NAMESPACES
+Dimension is an attribute of a metric (INSTANCE_ID, ENVIRONMENT, ETC..)
+Up to 10 dimensions per metric
+Can create Cloudwatch dashboard for metrics
+Can create custom metrics
+
+CloudWatch Metric Streams
+
+Continually stream CloudWatch metrics to a destination of your choice - Kinesis data firehose, 3rd party (Splunk, New Relic etc.)
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+CloudWatch Logs
+
+Can define log expiration policies
+Can send logs to:
+	S3
+	Kinesis Data firehose
+	Kinesis Data Streams
+	Lambda
+	OpenSearch
+
+Cloudwatch logs Sources:
+	SDK, CloudWATCH Logs, CloudWatch Unified Agent
+	Elastic beanstalk
+	Lambda
+	API GATEWAY
+	CloudTrail
+	Route53
+	VPC Flow logs
+
+CloudWatch Logs Metric Filter & Insights
+
+Can filter by expressions
+Metric filters can be used to trigger CloudWatch Alarm
+
+Export CloudWatch logs to S3:
+	Log data can take up to 12 hours to become available
+	API call is CreateExportTask
+	No real-time
+
+CloudWatch Logs Subscriptions
+
+Used for real-time or near real-time analyis of CloudWatch logs
+Setup subscription filter for service you want to stream log data to
+
+CloudWatch Logs Aggregation
+	Combine logs from different regions and combine them
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+CloudWatch Logs for EC2
+
+By default, no logs from EC2 will go to Cloudwatch
+Need a CloudWatch agent ATTACHED TO EC2 INSTANCE to push log files
+
+CloudWatch Logs Agent & Unified Agent
+
+Unified Agent is latest version.
+It can collect addiotnal system-level metrics such as RAM,processes
+----------------------------------------------------------------------------------------------------------------------------------------------------
+CloudWatch Alarms
+
+Alarm states:
+	OK
+	INSUFFICIENT_DATA
+	ALARM
+Period:
+	Length of time in seconds to evaluate a metric
+	
+Alarm targets:
+	Stop, Terminate , Reboot, recover EC2 instance
+	Trigger Auto scaling action
+	Send notification to SNS
+	
+CloudWatch Composite Alarms:
+
+Combining multiple alarms
+Use AND OR conditions to trigger alarms
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Amazon EventBridge
+
+Schedule Cron jobs (scheduled scripts) to trigger lambda functions
+Event Pattern - Event rules to react to a service doing something
+
+Types of Sources:
+	EC2, CodeBuild, S3 event, Trusted Advisor, CloudTrail
+
+EventBridge generate JSON from source data then gets sent into destinations
+Types of Destinations:
+	Lambda
+	AWS Batch
+	ECS task
+	SQS, SNS, Kinesis Data streams, EC2 actions
+
+You can archive events
+You can replay events (usefull for debugging)
+
+Schema Registry
+
+analyze events in your bus and infer the schema
+Allows you to generate code for your app that will know in advance how data is structured in the event bus
+Schema can be versioned
+
+Resource based policy:
+	Manage permissions for a specific event bus
+	Allow/deny events from another AWS account or AWS region
+	Use case: aggregate all events from your AWS organization in a single AWS account
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+CloudWatch Container Insights
+
+Collect, aggregate, summarie metrcis nd logs from containers
+Available for:
+	ECS, EKS
+	Kubernetes platforms on EC2
+	Fargate
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+CloudWatch Lambda Insights
+
+Monitoring and troubleshooting solution for serverless apps running on Lambda
+
+CloudWatch Contributor Insights
+
+Analyze log data and see metrics for top-N contributors
+Examples, find bad hosts, identify the heaviest network users
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+CloudTrail
+
+Provides governance, compliance and audit for your AWS account
+Enabled by default
+Get a history of events / API calls made within ypur AWS account by:
+	Console
+	SDK
+	CLI
+	AWS Services
+Can export into CloudWatch logs or S3
+a TRAIL CAN BE APPLIED TO All Regions (default) or a single region
+
+CloudTrail Events
+
+Management Events:
+	operations that are perfromed on resources in your AWS account
+	Can seperate Read Evetns from Write Events
+Data Events:
+	By default , not logged
+	FOR EXAMPLE, S3 object-level activity - GetObject on S3
+Insight Events:
+	Detects unusal activity in your account
+	It baselines what the usual activity looks like
+	You can then react when an anamoly event is captured (EventBridge event) 
+	
+Events Retention:
+	Stored for 90 days
+	To keep events longer, log them to S3 and use Athena to analyze them
+
+Intercept API calls
+
+cREATE ALERTS BASED ON SPECIFIC api CALL
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+AWS Config
+
+Helps with auditing and recording compliances of your AWS Resources
+Helps record configurations and changes over time
+Per-Region service
+
+Config Rules:
+	AWS managed config rules
+	custom config rules
+		evaluate if each EC2 instance is t2.micro
+	Rules can be evaluated/ triggered:
+		For each config change
+		And or at regular time intervals
+Config Rules does not prevent actions from happening
+Pricing:
+	$0.003 per configuration item recorded per region
+	$0.001 per config rule evaluations per region
+
+Remediations:
+	Automate remediations of non-compliant resources using SSM Automation Documents
+	You can trigger an event in EventBridge if something is non-compliant (example IAM Access key is expired so delete it)
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+CloudWatch vs CloudTrail vs Config
+
+ClouWatch:
+	Performance Monitoring & dashboards
+	Events & Alerting
+	Log Aggregation & Analysis
+CloudTrails:
+	Record all API calls
+Config:
+	Record config changes
+	Evaluate resources against compliance rules
+	Get timeline of changes and compliance
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS Organizations
+
+Allows to manage multiple accounts
+1 main account and as many child accounts
+Consolidated billing
+Discounts for overall usage
+
+Root acount normally has only 1 Management account has full admin power
+Organization Unit (OU)
+
+Service Control Policies (SCP):
+	Permissions available within the account in the OU
+	Restrict what children account can and cant do
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+IAM Conditions
+
+aws:SourceIp:
+	Restrict certain IP's
+
+aws:RequestedRegion:
+	Restrcit API calls from certain regions
+
+ec2:ResourceTag:
+	Restrict based on tags
+
+aws:MultiFactorAuthPresent:
+	forces MFA use
+	
+s3:ListBucket:
+	Bucket level permissions
+s3:GetObject, s3:PutObject:
+	Object level permissions
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+IAM Roles vs Resource Based Policices
+
+
+When you use a role, you give up any other permissions you had.
+The only permissions you have are governed by the permissions of the role
+
+For a Resourced based policy you dont give up permissions
+
+Amazon EventBridge - Works with both IAM and Resource based Policies
+
+For IAM:
+	EventBridge has an IAM role attached to it.
+	
+For Resource:
+	The resources which EventBridge uses have a resource based policy which allows EventBridge
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+IAM Permission Boundaries
+	Controls the maximum permissions a user can have.
+	This is not a common setting
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+IAM Identity Center
+
+Successor to AWS SSO
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Microsoft Active Directory
+
+Security management on Windows is basically the same in AWS
+
+Types:
+	AWS Managed AD:
+		Create your own AD in AWS, manage users locally, supports MFA
+		Establish trust connections with your on-prem AD
+	AS Connector:
+		Proxy to redirect to on-prem AD, supports MFA
+		Users are managed on-premies AD
+	Simple AD:
+		AD-compatible managed directory on AWS
+		Cannot be joined with on-prem AD
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS Control Tower
+
+Set-up and govern a multi-account AWS environment based on best practices
+Uses AWS Organizations to create accounts
+
+Benefits:
+	Automate the setup
+	Automate ongoing policy management using guardrails
+	Detect policy violations
+
+Guardrails:
+	Provides ongoing governanace for your Control Tower environment
+	Preventitive Guardrail: using SCPs
+	Detective Guardrails: using AWS Config (e.g identify untagged resources)
+	
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS Security
+
+KMS - kEY mANAGEMENT service
+
+manages encryption keys
+Fully integrated with IAM for authorization
+Integrates with most AWS services
+
+KMS Keys Types:
+KMS Keys is the master Key
+	Symmetric (AES-256 keys)
+		Single encryption key that is used to Encrypt and Decrypt
+	Asymmetric (RSA & ECC key pairs)
+		Public and private key pair
+		Use case when encryption is outside of AWS by users who cant call the KMS API
+		
+Types of KMS keys:
+	AWS Owned Keys - free - SSE-S3, SSE-SQS, SSE-DDB - DEFAULT KEY
+	AWS Manged Key - free - naming format (aws/service-name, e.g aws/rds)
+	Customer managed keys created in KMS - $1 per month
+	Customer imported keys - $1 per month
+Automatic Key rotation:
+	AWS-managed KMS key - auto every 1 year
+	Customer-managed key - auto every 1 year (must be enabled)
+	Imported KMS key - only manaul rotation possible using alias
+
+KMS keys are scoped by region
+You need to create snapshot and copy across to another region
+
+KMS Key Policies:
+	Similar to S3 bucket policies
+	By default, if you dont create a policy everyone in your account can access KMS keys
+	
+Copying Snapshots across accounts:
+	1 - Create a snapshot, encrypted with your own KMS key
+	2 - Attach a KMS key policy
+	3 - Share the encrypted snapshot
+	4 - Create a copy of the snapshot, encrypt it with a CMK in your account
+	5 - Create a volume from the snapshot
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+KMS Multi-Region Keys
+
+Replicate key to multiple regions
+	
+KMS Multi-region are not global (Primary key + Replica keys)
+Each Multi-region key is managed independently
+
+Not reccommended
+
+Use case:
+	Encrypt in 1 region and decrypt in another region
+	Global client-side encryption
+	Encryption on Global DynamoDB, Global Aurora
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+S3 Replication - Encryption
+
+Unencrypted objects and objects encrypted with SSE-S3 (Default key service) are replicated  by default
+Objects encrypted with customer key are never replicated
+
+Objects encrypted with SSE-KMS , you need to enable the option
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AMI Sharing process encrypted via KMS
+
+Must modify the LaunchPermission of the image to launch the image in another account
+Must share the KMS Keys used to encrypt the AMI
+The IAM role in the target account must have permission to Decrypt
+----------------------------------------------------------------------------------------------------------------------------------------------------
+SSM Parameter Store
+
+• Secure storage for configuration and secrets
+• Optional Seamless Encryption using KMS
+• Serverless, scalable, durable, easy SDK
+• Version tracking of configurations / secrets
+• Configuration management using path & IAM
+• Notifications with CloudWatch Events
+• Integration with CloudFormation
+
+SSM Parameter Store Hierarchy
+
+• /my-department/
+• my-app/
+• dev/
+• db-url
+• db-password
+• prod/
+• db-url
+• db-password
+• other-app/
+• /other-department/
+• /aws/reference/secretsmanager/secret_ID_in_Secrets_Manager
+• /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+
+Standard and advanced parameter tiers
+
+						Standard				Advanced
+
+Amount of params:		10,000					100,000			
+Max size of param:		4KB						8KB
+Param policy:			No						Yes
+Costs:					Free					Charges may apply
+Storage pricing:		Free					%0.0.5 per parameter per month
+
+
+Parameters Policies:
+	TTL
+	Can assign multiple polices at a time
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS Secrets Manager
+
+$0.40 per secret per month
+$0.05 per 10,000 API calls
+
+Used with RDS service
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS Cert Manager (ACM)
+
+Manage TLS certs
+TLS used to provide in-flight encryption (HTTPS)
+Cant use ACM with EC2
+
+To use an ACM certificate with Amazon CloudFront, you must request or import the certificate in the US East (N. Virginia) region.
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS WAF
+
+PROTECTS YOUR APP FROM COOMON WEB EXPLOITS
+
+Deploy on :
+	ALB
+	API GATEWAY
+	Cloudfront
+	AppSync graphql api
+	Cognito User Pool
+	
+Define Web ACL - Control list -who can access
+	Set up to 10,000 IP addresses
+	Geo-Match (block countries)
+	Protect from SQL Injection
+	Rate-based rules - count occureences per IP - stop bots (DDoS protection)
+	
+Web ACL is Regional except for Cloudfront
+A rule group is a resusable set of rules you can add to a web ACL
+
+Use Global Accelerator to use a fixed IP and WAF on a ALB
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS Shield - Protects from DDoS attack
+
+Shield Standard:
+	Free service
+Shield Advanced:
+	$3,000 per month
+	Protects against more sophistacated attacks
+	24/7 access to AWS DDoS response teams
+	
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS Firewall Manager
+
+
+Manage rules in all accounts of an AWS Organization
+
+• Common set of security rules
+• WAF rules (Application Load Balancer, API Gateways, CloudFront)
+• AWS Shield Advanced (ALB, CLB, Elastic IP, CloudFront)
+• Security Groups for EC2 and ENI resources in VPC	
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+WAF vs Firewall Manager vs Shield
+
+	Use all 3 together for full protection
+	For granular protection of your resources, use WAF alone
+	To use WAF across multi accounts, use Firewall Manager along with AWS WAF
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS GuardDuty - DOES NOT ANALYSE CLOUDWATCH LOGS !
+
+Uses AI to detect anamolies in your account
+Analyses CloudTrail logs and events
+Analyses DNS logs
+Analyses Kubernetes Audit Logs
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS Inspector
+
+Provides Automated Security Assessments
+
+For EC2 instances:
+	Leverages the SSM agent
+	Analyses OS against known vulvnerabilites
+
+For Containers push to Amazon ECR:
+	Assessment of containers as they are pushed
+
+For Lambda functions:
+	
+
+Reporting & integration with AWS Security Hub
+• Send findings to Amazon Event Bridge
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Amazon Macie
+
+Amazon Macie is a fully managed data security and data privacy service
+that uses machine learning and pattern matching to discover and protect your sensitive data in AWS.
+• Macie helps identify and alert you to sensitive data, such as personally identifiable information (PII)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
