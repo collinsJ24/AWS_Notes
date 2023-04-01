@@ -325,7 +325,7 @@ Dynamic scaling policies
 Predictive Scaling
 	Continously forecasts load and schedule scaling ahead of time (AI)
 
-Good metric sto cale on:
+Good metrics to cale on:
 	CPU utilization
 	RequestCountPerTarget - measure no. of request per EC2 instances
 
@@ -2170,6 +2170,988 @@ Amazon Macie
 Amazon Macie is a fully managed data security and data privacy service
 that uses machine learning and pattern matching to discover and protect your sensitive data in AWS.
 • Macie helps identify and alert you to sensitive data, such as personally identifiable information (PII)
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Networking - VPC 
+
+CIDR IP4
+	Consists of 2 components:
+		Base IP
+		Subnet Mask - Defines how many bits can change in the IP
+
+AWS RESERVES 5 IP ADDRESSES IN A SUBNET (so you must account for this when choosing the size of your subnet)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+NAT Instance - deprecated but allows access to external IP's from private subnet
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+NAT Gateway
+
+AWS Managed NAT
+
+Pay per hour
+NATGW is created in a specific AZ, uses an Elastic IP
+
+cANT BE USED BY EC2 INSTANCE IN THE SAME Subnet
+
+rEQUIRES AN INTERNET GATEWAY 
+
+Must create multiple NAT GATEWAYS for fault tolerance
+
+Does not work with Security Groups and cannot be used as a bastion host
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+NACL - network access control list  - Operate a at subnet level
+
+Like a firewall which control traffic to/from subnets
+1 NACL per subnet
+You define the NACL rules
+
+Default NACL - Allows all inbound/outbound traffic - Dont modify, creat custom NACL's
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Ephemeral Ports
+
+An ephemeral port is a temporary communication hub used for Internet Protocol (IP) communications. 
+It is created from a set range of port numbers by the IP software and used as an end client's port 
+assignment in direct communication with a well-known port used by a server.
+
+Ephemeral means temporary or short-lived, as is the characteristic of this type of port.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Security Groups vs NACL's
+
+SG is statefull
+SG only supports allow rules
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+VPC Peering
+
+Connect 2 VPCs using AWS Network
+
+VPC peering is not TRANSITIVE (Must be established for each VPC that need to communicate with one another)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+VPC Endpoints
+
+VPC Endpoints are used so your instances dont have to go through the public internet to reach AWS RESOURCES (S3 , DynamoDB etc..)
+
+Deployed within VPC
+
+Types of Endpoints:
+	Interface Endpoints 
+		Porvisions an ENI as an entry 
+		Supports most AWS services
+		$ per hour + $ per GB of data processed
+	Gateway endpoints:
+		Provisions a gateway and must be used as a target in a route table (does not use security groups)
+		Free
+		Only for S3 and DynamoDB
+	
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+VPC Flow Logs
+
+Capture info about IP traffic going into:
+	VPCs
+	Subnet
+	ENI
+
+Used for troubleshooting
+
+You add these to your resources and speicify the output bucket / cloudwatch log groups
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS Site-to-Site VPN
+
+Attach Customer Gateway to customer server:
+	This is a software application or physical device
+Virtual Private Gateway (VGW) on AWS VPC
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS VPN CloudHub
+
+Used for multiple customer sites with different VPN connections
+To setup, connect multiple VPN connections on the same VGW, setup dynamic routing and configure route tables
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Direct Connect (DX)
+
+Dedicated private connection from a remote network to your VPC
+Use cases:
+	Increased bandwith throuput - working with large data sets
+	Lower cost
+	More consistent newtwork experience
+	Hybrid environments (on-prem + cloud)
+Supports both IPv4 and IPv6
+----------------------------------------------------------------------------------------------------------------------------------------------------
+Direct Connect Gateway
+
+Used to connect to multiple VPCs
+
+Dedicated Connection > Hosted Connections
+
+Takes 1 month to establish a new connection
+
+Direct Connect + VPN = encrypted private connection
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Transit GATEWAY
+
+Transitive peering between thousands of VPC and on-premies, hub-and-spoke connection
+Route tables: limit which VPC can talk with other VPCs
+Works with Direct Connect Gateway, VPN connections
+Supports IP Multicast
+
+Increases Bandwith using ECMP (Equal-cost multi path routing)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+VPC - Traffic Mirroring
+
+Capture and inspect network traffic in VPC 
+Route the trafic to security apps that you can manage
+Capture traffic
+	from source - ENI
+	TO targets - ENI or a NLB
+Capture all packets or capture the packets of your interest
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+IPv6
+
+Created because IPv4 addresses will soon be exhausted
+They are public and routable - no private range
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Egress-only Internet Gateway
+
+Only for IPv6 !!
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+VPC Summary
+
+CIDR – IP Range
+• VPC – Virtual Private Cloud => we define a list of IPv4 & IPv6 CIDR
+• Subnets – tied to an AZ, we define a CIDR
+• Internet Gateway – at the VPC level, provide IPv4 & IPv6 Internet Access 
+• Route Tables – must be edited to add routes from subnets to the IGW, VPC Peering Connections, VPC Endpoints, …
+• Bastion Host – public EC2 instance to SSH into, that has SSH connectivity to EC2 instances in private subnets
+• NAT Instances – gives Internet access to EC2 instances in private subnets. Old, must be setup in a public subnet, disable Source / Destination check flag
+• NAT Gateway – managed by AWS, provides scalable Internet access to private EC2 instances, IPv4 only
+• Private DNS + Route 53 – enable DNS Resolution + DNS Hostnames (VPC)
+
+
+• NACL – stateless, subnet rules for inbound and outbound, don’t forget Ephemeral Ports
+• Security Groups – stateful, operate at the EC2 instance level
+• Reachability Analyzer – perform network connectivity testing between AWS 
+resources
+• VPC Peering – connect two VPCs with non overlapping CIDR, non-transitive
+• VPC Endpoints – provide private access to AWS Services (S3, DynamoDB, CloudFormation, SSM) within a VPC
+• VPC Flow Logs – can be setup at the VPC / Subnet / ENI Level, for ACCEPT and REJECT traffic, helps identifying attacks, analyze using Athena or CloudWatch Logs 
+Insights
+• Site-to-Site VPN – setup a Customer Gateway on DC, a Virtual Private Gateway on VPC, and site-to-site VPN over public Internet
+• AWS VPN CloudHub – hub-and-spoke VPN model to connect your sites
+
+ Direct Connect – setup a Virtual Private Gateway on VPC, and establish a direct private connection to an AWS Direct Connect Location
+• Direct Connect Gateway – setup a Direct Connect to many VPCs in different AWS regions
+• AWS PrivateLink / VPC Endpoint Services:
+• Connect services privately from your service VPC to customers VPC
+• Doesn’t need VPC Peering, public Internet, NAT Gateway, Route Tables
+• Must be used with Network Load Balancer & ENI
+• ClassicLink – connect EC2-Classic EC2 instances privately to your VPC
+• Transit Gateway – transitive peering connections for VPC, VPN & DX
+• Traffic Mirroring – copy network traffic from ENIs for further analysis
+• Egress-only Internet Gateway – like a NAT Gateway, but for IPv6
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS Network Firewall
+
+Protect your entire Amazon VPC
+fROM LAYER 3 TO LAYER 7 PROTECTION
+Can be used with multiple VPCs
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Disaster Recovery Overview
+
+RPO - Recovery Point Objective - How far back we have backed up to
+RTO - Recovery Time Objective - How long to restore
+
+BackUp and Restore
+	High RPO and RTO
+Pilot Light
+	A small version of app is always running in the cloud
+	Only for critical infrastructure
+	Faster than backup and restore
+
+Warm Standby
+	Full system up and running, but at minimum size (Scaled down )
+	Upon disaster, we can scale to production load
+
+Multi Site / Hot Site Approach
+	Very low RTO - very expensive
+	Full production scale is running in AWS and On Premises
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+DMS - Database Migration Service
+
+Migrate db to AWS from on-premises
+Supports:
+	Oracle
+	Microsoft SQL
+Continous Data Replication using CDC
+Create EC2 INSTANCE to perfrom the replication task
+
+DMS Source and Targets:
+Sources:
+	MySQL, MariaDB, PostgresSQL
+	Azure
+	RDS
+	S3
+Targets:
+	RDS, RedShift, DynamoDB, S3,Kineses Data Streams
+
+If target and source dont have the same engine, you use AWS SCT
+SCT - Schema Coversion Tool
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+RDS and Aurora MySQL migrations
+2 options:
+	Create a snapshot and restore from that
+	Create an Auorora Read Replica from your RDS MySQL and promote it as own DB cluster
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+On-Premise strategy with AWS
+
+Ability to run AMI as a VM on your on-prem server
+VM import/export
+	Migrate existing apps into EC2
+	Create a DR repository strategy for your on-premises VM's
+AWS aPP DISCoVERY Service
+	used to gather info to plan a migraion
+AWS DMS
+AWS Server Migration Service
+	Incremental Replication of on-prem live servers to AWS
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS Backup
+
+Fully managed service
+Centrally managed and automate backups across AWS services
+Data Sync Supported services:
+	EC2, S3, RDS, DocumentDB, EFS, FSx, Storage GATEWAY
+Supports cross-region backups
+Supports cross-account backups
+Supports PITR 
+On-demand and scheduled backups
+Tag-based backup policy
+Backup policy - frequencey, retention period  etc..
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS Backup Vault Lock
+
+Enforces a WORM (Write Once Read Many) state for all your backups that you store in your AWS Backup Vault
+Additional layer of defense to protect your backup against:
+	Inadvertent or malicious delete operations
+	Updates that shorten or alter retention periods
+	
+Even the root user cannot delete backups when enabled
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS Application Discovery Service
+
+Scan your on-prem servers and gather data needed for migrations
+
+Agentless Discovery
+	VM inventory, configuration and performance history such as CPU, memory and disk usage
+Agent-based discovery
+	System config, performance, running processes
+Resulting data can be viewed in AWS Migration Hub
+----------------------------------------------------------------------------------------------------------------------------------------------------
+aws aPPLICATION Migration Service
+
+Lift-and-Shift solution which simplifies migration
+Converts your pyhsical and virtual servers to run natively on AWS
+
+aws rEPLICATION aGENT will perform continous replication to migrate to a staging temporary environment and then eventually move to a production environment
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Transferring large amount of data into AWS
+
+Example: transfer 200 TB of data in the cloud. We have a 100 Mbps internet connection. 
+• Over the internet / Site-to-Site VPN:
+• Immediate to setup
+• Will take 200(TB)*1000(GB)*1000(MB)*8(Mb)/100 Mbps = 16,000,000s = 185d
+• Over direct connect 1Gbps:
+• Long for the one-time setup (over a month)
+• Will take 200(TB)*1000(GB)*8(Gb)/1 Gbps = 1,600,000s = 18.5d
+• Over Snowball:
+• Will take 2 to 3 snowballs in parallel 
+• Takes about 1 week for the end-to-end transfer
+• Can be combined with DMS
+• For on-going replication / transfers: Site-to-Site VPN or DX with DMS or DataSync
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+VMware Cloud on AWS
+
+For customers who use VMware CLOUD USED TO MANAGE THEIR ON-PREM DATA Center, they can automatically move to VMWre Cloud on AWS 
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+High Performance Computing ( HPC )
+
+Services for data management & Transfer:
+	AWS Direct Connect
+	Snowball & Snowmobile
+	DataSync
+Services for compute and networking:
+	EC2 instances
+	EC2 Placement groups
+	EC2 Enhanced networking (SR-IOV) - higher bandwith, higher PPS, lower latency
+		Elastic Network Adapter (ENA) upt to 100 Gbps
+		Elastic Fabric Adapter (EFA) - Improved ENA , only works for Linux
+	
+Services for Storage:
+	EBS
+	Instance Store
+Network storage:
+	S3
+	EFS
+	FSx for Lustre
+
+Automation and Orchestration:
+	AWS Batch
+	AWS ParallelCluster
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+CloudFormation
+
+Infrastructure as code
+No manual creation of resources
+Supports amost all AWS resources
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+SES - SImple email service
+
+Managed service to send emails globally
+used for marketing emails, transanctional emails etc..
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Amaon Pinpoint
+
+Scalable 2-way marketing communications service
+Customize messages
+Can recieve replies
+
+It provides a variety of advanced features such as audience segmentation, A/B testing, personalization, and analytics. 
+With Pinpoint, you can create targeted campaigns that reach your audience with personalized messages and optimize your communication strategy.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+SSM Session Manager
+
+Use secure shell (SSH) WITHOUT opening port 22 on EC2 instance
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS SSM
+
+
+Amazon Systems Manager (SSM) is a management service that helps you automate and manage your infrastructure at scale in AWS. 
+SSM provides a unified user interface that simplifies resource and application management tasks 
+across multiple AWS services and on-premises resources. It allows you to manage instances, patch applications, 
+automate workflows, run commands, and manage resources using a single dashboard. 
+With SSM, you can gain visibility and control over your infrastructure, reduce manual errors, and improve security and compliance.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS Cost Explorer is a tool that provides you with insights into your AWS costs and usage. 
+It allows you to visualize and understand your AWS spending,
+and to analyze your costs and usage patterns to identify areas where you can optimize your costs.
+
+Can also forecast future costs
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS Elastic Transcoder
+
+Used to convert media files stored in S3 into different formats depending on playback device (eg. mobile device, laptop )
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+AWS Batch
+
+Fully managed batch processing at any scale
+
+On AWS batch jobs are defined as Docker images and run on ECS
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Amazon AppFlow
+
+Amazon AppFlow is a fully managed integration service provided by AWS that allows you to securely transfer data 
+between various SaaS applications and AWS services.
+It provides a simple, point-and-click interface that enables you to easily configure data flows and automate data transfers between applications.
+
+Example SalesForce is a SaaS provider
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Well Architected Framework 
+General Guiding Principles • https://aws.amazon.com/architecture/well
+-architected
+• Stop guessing your capacity needs 
+• Test systems at production scale 
+• Automate to make architectural experimentation easier 
+• Allow for evolutionary architectures 
+• Design based on changing requirements 
+• Drive architectures using data 
+• Improve through game days 
+• Simulate applications for flash sale day
+
+Well Architected Framework 
+6 Pillars
+
+1) Operational Excellence
+• 2) Security
+• 3) Reliability
+• 4) Performance Efficiency
+• 5) Cost Optimization
+• 6) Sustainability
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+Sample Test Notes
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Spread placement can have a maximum of 7 running instances per Azure
+
+Guard Duty used to monitor, Macie used to identify
+
+It is not possible to modify a launch configuration once created.
+
+You cannot use a launch configuration to provision multiple instance types (On-demand & Spot instances)
+
+VPC sharing allows you to create shared resources between 2 accounts under the same parent organizations
+
+You cant directly copy data from Snowball Edge devices to S3 Glacier
+
+EC2 User Data scripts only runs during the boot cycle, not when the instance is re-started
+By default, the scripts are executed with root user privileges
+
+EC2 Reboot CloudWatch Alarm can be used to reboot instances
+
+GuardDuty works with -> VPC Flow Logs, DNS logs, CloudTrail logs
+
+AWS Global Accelerator can be used to distribute a portion of traffic to a particular deployment 
+(It gets rid of any issues that could crop up with potential DNS Caching)
+
+DAX - in memory cache for DynamoDB
+
+Use CloudTrail to analyze S3 bucket and object-level actions.
+
+Use Amazon S3 bucket policies to manage access to user level and account level access permissions
+ 
+API Gateway can be used to throttle requests
+
+Use RedShift Spectrum to analyse historical data
+
+ECS with EC2 launch type is charged based on EC2 instances and EBS volumes used.
+ECS with Fargate launch type is charged based on vCPU and memory resources that the containerized application requests
+
+AWS PrivateLink, a highly available, scalable technology that enables you to privately connect your VPC to supported AWS services.
+
+AWS DMS enables you to seamlessly migrate data from supported sources to relational databases, data warehouses, streaming platforms, and other data stores in AWS cloud.
+AWS DMS supports specifying Amazon S3 as the source and streaming services like Kinesis and Amazon Managed Streaming of Kafka (Amazon MSK) as the target
+
+You cannot SSH into an RDS DB instance.
+
+Dedicated Hosts enable you to use your existing server-bound software licenses 
+like Windows Server and address corporate compliance and regulatory requirements.
+
+When you create an encrypted EBS volume and attach it to a supported instance type, data stored at rest on the volume,
+data moving between the volume and the instance, snapshots created from the volume and volumes created from those snapshots are all encrypted
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
